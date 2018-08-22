@@ -3,9 +3,9 @@ define("DIR_DATABASE", $_SERVER["DOCUMENT_ROOT"] . "/api/vendor/database/");
 include_once $_SERVER["DOCUMENT_ROOT"] . "/api/vendor/Db.php";
 
 $dbConfig = array(
-	"dbName" => "axcompdemo",
-	"user" => "axcompdemo",
-	"password" => "8iNbR7HgaxJGlJnq",
+	"dbName" => "myDb",
+	"user" => "myDb",
+	"password" => "---------",
 	"driver" => "Mysqli",
 	"host" => "localhost");
 define("DB_DATABASE", $dbConfig["dbName"]);
@@ -14,10 +14,10 @@ $dbConnection = new Db($dbConfig["driver"], $dbConfig["host"], $dbConfig["user"]
 
 $roles = array("guest");
 $email = array(
-	"Username" => "ascentix.uat",
-	"Password" => "MyFancyPass58~",
-	"SetFrom" => ["email" => "ascentix.uat@gmail.com", "name" => "Docs app"],
-	"AddReplyTo" => ["email" => "bogdanim36@gmail.com", "name" => "Bogdan Ionescu"],
+	"Username" => "xxx",
+	"Password" => "MyFancyPass",
+	"SetFrom" => ["email" => "xxx@gmail.com", "name" => "My App"],
+	"AddReplyTo" => ["email" => "replayTo@gmail.com", "name" => "Your name"],
 	"Host" => "smtp.gmail.com",
 	"Port" => 587,
 	"SMTPSecure" => "tls",
