@@ -15,7 +15,7 @@ For each controller you need to create only one file with contain model definiti
 
 All actions methods of model are named with ending action word (if you want to create other actions).
 
-The base model has methods for all crud operations: create, update, delete, new. All operations are inside of transaction db system, validate data before create,update. Also has actions for retrive data: getListAction($where, $order) si getItemAction($where). Response is sended as JSON with structure:
+The base model has methods for all crud operations: create, update, delete, new. All operations are encapsulated of db system transaction, validate data before create,update. Also has actions for retrive data: getListAction($where, $order) si getItemAction($where). Response is sended as JSON with structure:
 
  - status = true/false, true if the action was completed without errors
  - data = contaion the response expected (item, list)
