@@ -1,7 +1,7 @@
 <?php
 include_once "config.php";
 
-class MenuRolesConfig
+class MenuRoles
 {
 	static public $userId;
 
