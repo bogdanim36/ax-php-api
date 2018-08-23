@@ -11,6 +11,8 @@ In config.php you can:
   - adding menu options if you want to create application menu on server side.
   - define a method for authorizing each uri.
   
+Api calls can look like zis: city/getList, city/create, city/update?id=1, city/delete?id=2.
+
 For each controller you need to create only one file which contain model definition as well. (Yes I know: the controller must be a separate file - you can change it if you didn't like this solution). 
 
 All actions methods of model are named with ending action word (if you want to create other actions).
