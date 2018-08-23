@@ -11,15 +11,19 @@ In config.php you can:
   - adding menu options if you want to create application menu on server side.
   - define a method for authorizing each uri.
   
-For each controller you need to create only one file with contain model definition as well. (Yes I know: the controller must be an separate file - you can change it if you didn't like mine solution).
+For each controller you need to create only one file with contain model definition as well. (Yes I know: the controller must be a separate file - you can change it if you didn't like this solution).
 
-All actions methods of model are named with ending action.
+All actions methods of model are named with ending action word (if you want to create other actions).
 
-The base model has methods for all crud operations: create, update, delete, new. All operations are inside of transaction db system, validate data before create,update.
+The base model has methods for all crud operations: create, update, delete, new. All operations are inside of transaction db system, validate data before create,update. Also has actions for retrive data: getListAction($where, $order) si getItemAction($where). Response is sended as JSON with structure:
+
+ - status = true/false, true if the action was completed without errors
+ - data = contaion the response expected (item, list)
+ - errors = contain error message if status is false
 
 In samples folder, you can see how you can define models.
 
-This php library  and files from samples directory are used in my project:
+This php library and files from samples directory are used in my project:
 http://bogdanim36.asuscomm.com:5018/#!/ax-frmk/features
 
 
