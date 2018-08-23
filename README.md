@@ -1,5 +1,6 @@
 # php-rest-api
-Simple php library for using as REST api
+Simple php library for using as REST api to use with php Mysqli driver.
+
 In config.php you can: 
   - define link connection to MySQL database 
   - define routes. An array with each items having  properties: 
