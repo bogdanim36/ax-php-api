@@ -28,4 +28,3 @@ In samples folder, you can see how you can define models.
 This php library and files from samples directory are used in my project:
 http://bogdanim36.asuscomm.com:5018/#!/ax-frmk/features
 
-
