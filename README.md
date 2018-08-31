@@ -7,7 +7,7 @@ In config.php you can:
     - uri
     - file - file which contain model class
     - class - model class name
-    - authorized - true (default) is url must be authorized
+    - authorized - true (default) if url must be authorized
   - adding menu options if you want to create application menu on server side.
   - define a method for authorizing each uri.
   
@@ -20,8 +20,8 @@ All actions methods of model are named with ending action word (if you want to c
 The base model has methods for all crud operations: create, update, delete, new. All operations are encapsulated of db system transaction, validate data before create,update. Also has actions for retrive data: getListAction($where, $order) si getItemAction($where). Response is sended as JSON with structure:
 
  - status = true/false, true if the action was completed without errors
- - data = contaion the response expected (item, list)
- - errors = contain error message if status is false
+ - data = contains the response expected (item, list)
+ - errors = contains error message if status is false
 
 In samples folder, you can see how you can define models.
 
