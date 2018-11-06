@@ -1,15 +1,6 @@
 <?php
-include_once "base.controller.php";
-
-class ModelItem
-{
-	public function __construct($item)
-	{
-		foreach ($this as $key => $value) {
-			$this->$key = isset($item->$key) ? $item->$key : null;
-		}
-	}
-}
+require_once "base.controller.php";
+require_once "base.model-item.php";
 
 class BaseModel extends BaseController
 {
@@ -24,18 +15,11 @@ class BaseModel extends BaseController
 	public $children = null;
 	public $validateOnWrite = true;
 
-	public function __construct(DB $db, $postData = "{}")
+	public function __construct(DB $db, $postData = "[]")
 	{
 		$this->db = $db;
 		if (isset($postData)) $this->postData = json_decode($postData, false);
 		if (isset($this->postData) && isset($this->postData->item)) $this->item = new $this->modelItem($this->postData->item);
-	}
-
-	public function getServerRoot()
-	{
-		return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != "off" ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/';
-//      if (isset($_SERVER["HTTP_REFERER"])) return $_SERVER["HTTP_REFERER"];
-//      if (isset($_SERVER["HTTP_ORIGIN"])) return $_SERVER["HTTP_ORIGIN"];
 	}
 
 	public function action($action)
@@ -98,7 +82,6 @@ class BaseModel extends BaseController
 			$order = " ORDER BY ";
 			$cnt = 0;
 			foreach ($data as $key => $value) {
-
 				$order .= ($cnt > 0 ? "," : "") . $key . " " . $value . " ";
 				$cnt++;
 			}
@@ -278,18 +261,21 @@ class BaseModel extends BaseController
 	}
 
 
-	public function sqlBuildGetAllItems($where = null, $order = null)
+	public function sqlBuildGetAllItems($where = null, $order = null, $limit = null)
 	{
 		$cmd = 'SELECT a.* FROM `' . $this->tableName . '` a ';
 		if (isset($where)) $cmd .= $this->sqlBuildWhere($where);
 		if (isset($order)) $cmd .= $this->sqlBuildOrder($order);
+		if (isset($limit)) $cmd .= " limit " . $limit;
+
 		return $cmd;
 	}
 
 	public function sqlBuildGetItem($where = null, $order = null)
 	{
-		return $this->sqlBuildGetAllItems($where,$order);
+		return $this->sqlBuildGetAllItems($where, $order);
 	}
+
 	public function sqlBuildDeleteAll($where = null)
 	{
 		$cmd = 'DELETE FROM `' . $this->tableName . '` ';
@@ -341,11 +327,11 @@ class BaseModel extends BaseController
 		return $response;
 	}
 
-	public function createErrorResponse($message)
+	public function setOkResponse($data)
 	{
 		$response = array();
-		$response["errors"] = ["" => [$message]];
-		$response["status"] = false;
+		$response["data"] = $data;
+		$response["status"] = true;
 		return $response;
 	}
 
@@ -368,10 +354,10 @@ class BaseModel extends BaseController
 
 	}
 
-	public function getListAction($where = null, $order = null)
+	public function getListAction($where = null, $order = null, $limit = null)
 	{
 		try {
-			$queryResult = $this->db->query($this->sqlBuildGetAllItems($where, $order));
+			$queryResult = $this->db->query($this->sqlBuildGetAllItems($where, $order, $limit));
 			$response = array();
 			$response["data"] = $queryResult->rows;
 			$response["status"] = true;
@@ -386,9 +372,24 @@ class BaseModel extends BaseController
 	{
 		$response = array();
 		$item = array("id" => 0);
+		$object = new $this->modelItem(null);
+		foreach ($object as $key => $value) {
+			$item[$key] = null;
+		}
 		$response["data"] = $item;
 		$response["status"] = true;
 		return $response;
+	}
+
+	/**
+	 * @param $class
+	 * @param $method
+	 * @param $ex {Exception}
+	 * @return array
+	 */
+	public function errorResponse($class, $method, $ex)
+	{
+		return array("status" => false, "error" => array("class" => $class, "method" => $method, "message" => $ex->getMessage()));
 	}
 
 	public function createAction($fromParent = false, $data = null)
@@ -410,7 +411,7 @@ class BaseModel extends BaseController
 			$children = $this->childrenInsert($item->id);
 			if (!$children["status"]) return $children;
 			if (method_exists($this, "createActionCallback")) {
-				$response = $this->createActionCallback($response, $this->postData);
+				$response = $this->createActionCallback($response, json_encode($this->postData));
 				if (!$response["status"]) return $this->rollback("create", null, $response);;
 			}
 			$response["data"] = $this->getItemQuery($item->id);
@@ -430,7 +431,7 @@ class BaseModel extends BaseController
 			$response["status"] = false;
 			if (!$fromParent) {
 				if (!$this->validate($data)) {
-					$response["errors"] = array("children" => $this->childrenErrors);
+					if ($this->children) $response["errors"] = array("children" => $this->childrenErrors);
 					return $response;
 				}
 			} else $this->validate($data);
@@ -444,7 +445,7 @@ class BaseModel extends BaseController
 			$children = $this->childrenInsert($item->id);
 			if (!$children["status"]) return $children;
 			if (method_exists($this, "updateActionCallback")) {
-				$response = $this->updateActionCallback($response, $this->postData);
+				$response = $this->updateActionCallback($response, json_encode($this->postData));
 				if (!$response["status"]) return $this->rollback("update", null, $response);;
 			}
 			$response["data"] = $this->getItemQuery($item->id);
@@ -468,7 +469,7 @@ class BaseModel extends BaseController
 			$response["data"] = $this->getItemQuery($id);
 			$response["status"] = $this->db->query($this->sqlBuildDeleteItem($id));
 			if (method_exists($this, "deleteActionCallback")) {
-				$response = $this->deleteActionCallback($response, $this->postData);
+				$response = $this->deleteActionCallback($response, json_encode($this->postData));
 				if (!$response["status"]) return $this->rollback("delete", null, $response);
 			}
 			$this->db->commit();
@@ -548,7 +549,7 @@ class BaseModel extends BaseController
 				$classObj->item->{$classObj->foreignKey} = $this->item->{$this->tableKey};
 				$classObj->errors = [];
 				$this->childrenObjects[$class][] = $classObj;
-				$errItem = !$classObj->validate();
+				$errItem = !$classObj->validate($item);
 				$childErrors[] = $classObj->errors;
 				if ($errItem) $childHasErrors = true;
 			}
@@ -562,29 +563,14 @@ class BaseModel extends BaseController
 		return !$hasErrors;
 	}
 
-}
+	public function getLastId($where)
+	{
+		$cmd = "SELECT a.{$this->tableKey} FROM `" . $this->tableName . "` a ";
+		if ($where) $cmd .= $this->sqlBuildWhere($where);
+		$cmd .= " order by {$this->tableKey} DESC";
+		$result = $this->db->query($cmd);
+		if (count($result->row)) return $lastId = $result->row[$this->tableKey];
+		else return null;
 
-function array_column1(array $input, $columnKey, $indexKey = null)
-{
-	$array = array();
-	foreach ($input as $value) {
-		if (!isset($value[$columnKey])) {
-			trigger_error("Key \"$columnKey\" does not exist in array");
-			return false;
-		}
-		if (is_null($indexKey)) {
-			$array[] = $value[$columnKey];
-		} else {
-			if (!isset($value[$indexKey])) {
-				trigger_error("Key \"$indexKey\" does not exist in array");
-				return false;
-			}
-			if (!is_scalar($value[$indexKey])) {
-				trigger_error("Key \"$indexKey\" does not contain scalar value");
-				return false;
-			}
-			$array[$value[$indexKey]] = $value[$columnKey];
-		}
 	}
-	return $array;
 }

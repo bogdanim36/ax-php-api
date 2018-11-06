@@ -1,13 +1,12 @@
 <?php
 
-
 class BaseController
 {
    public $modelClass;
    public $db;
    public $postData;
 
-   public function __construct($dbConnection, $postData = "{}")
+   public function __construct($dbConnection, $postData = "[]")
    {
       $this->db = $dbConnection;
       $this->postData = json_decode($postData, false);
