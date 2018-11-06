@@ -1,15 +1,14 @@
 <?php
 $dbConfig = array(
-	"dbName" => "invoicing",
-	"user" => "invoicing",
-	"password" => "8iNbR7HgaxJGlJnq",
+	"dbName" => "myDb",
+	"user" => "myDb",
+	"password" => "myPass",
 	"driver" => "Mysqli",
 	"host" => "localhost");
 $email = array(
-	"Username" => "bogdanim.work",
-	"Password" => "Minerva21!",
-	"From" => ["email" => "bogdanim.work@gmail.com", "name" => "Invoicing app"],
-//	"AddReplyTo" => ["email" => "bogdanim36@gmail.com", "name" => "Invoicing app"],
+	"Username" => "userName",
+	"Password" => "myPass1",
+	"From" => ["email" => "myEmail", "name" => "App name"],
 	"Host" => "smtp.gmail.com",
 	"Port" => 587,
 	"SMTPSecure" => "tls",
