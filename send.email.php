@@ -5,7 +5,7 @@ require_once 'vendor/PHPMailer/class.phpmailer.php';
 require_once 'vendor/PHPMailer/class.smtp.php';
 require_once 'vendor/PHPMailer/class.pop3.php';
 
-class SendEmailMessage
+class SendEmail
 {
 	public $config;
 
