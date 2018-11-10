@@ -1,13 +1,12 @@
 <?php
 define("DIR_DATABASE", $_SERVER["DOCUMENT_ROOT"] . "/api/vendor/database/");
-require_once "config.routes.php";
-require_once "vendor/Db.php";
-require_once "./config.secrets.php";
-require_once "./config.appinfo.php";
+require_once get_path("", "config.routes.php");
+require_once get_path("vendor", "Db.php");
+require_once get_path("", "config.secrets.php");
+require_once get_path("", "config.appinfo.php");
 define("DB_DATABASE", $dbConfig["dbName"]);
-$dbConnection = new Db($dbConfig["driver"], $dbConfig["host"], $dbConfig["user"], $dbConfig["password"], $dbConfig["dbName"]);
 
-class Route
+class Router
 {
 	public $routes = array();
 	static public $defaultActions = ["create", "delete", "getItem", "getList", "new", "update"];
@@ -43,13 +42,13 @@ class Route
 		$controller = explode("/", $uri)[0];
 		$action = explode("/", $uri)[1];
 		$file = $routeDef["file"];
-		$class = isset($routeDef["class"]) ? $routeDef["class"] : str_replace(".php", "", $file);
+		$class = isset($routeDef["class"]) ? $routeDef["class"] : pathinfo($file, PATHINFO_FILENAME);
 		$authorized = isset($routeDef["authorized"]) ? $routeDef["authorized"] : true;
 		if ($action == "*") foreach (self::$defaultActions as $action) $this->addRoute($controller, $action, $file, $class, $authorized);
 		else $this->addRoute($controller, $action, $file, $class, $authorized);
 	}
 
-	public function submit($postData)
+	public function submit()
 	{
 		global $dbConnection;
 		$uriGetParam = trim(isset($_GET[ROUTE_PARAM]) ? $_GET[ROUTE_PARAM] : '/', " / ");
@@ -64,7 +63,7 @@ class Route
 				}
 				$classFile = implode([$_SERVER["DOCUMENT_ROOT"], API_ROOT, $file], "/");
 				require_once($classFile);
-				$ctrlObj = new $class($dbConnection, $postData);
+				$ctrlObj = new $class($dbConnection);
 				return $ctrlObj->action($action);
 			}
 		}

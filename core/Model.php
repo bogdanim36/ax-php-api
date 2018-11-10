@@ -1,5 +1,5 @@
 <?php
-class ModelItem
+class Model
 {
 	public function __construct($item)
 	{

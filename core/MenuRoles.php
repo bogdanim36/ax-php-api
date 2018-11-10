@@ -1,6 +1,6 @@
 <?php
 require_once "config.menu.php";
-require_once "menu-item.php";
+require_once "MenuItem.php";
 
 class MenuRoles
 {

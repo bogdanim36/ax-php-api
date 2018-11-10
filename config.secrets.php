@@ -1,16 +1,17 @@
 <?php
 $dbConfig = array(
-	"dbName" => "myDb",
-	"user" => "myDb",
-	"password" => "myPass",
+	"dbName" => "pm",
+	"user" => "pm",
+	"password" => "8iNbR7HgaxJGlJnq",
 	"driver" => "Mysqli",
-	"host" => "localhost");
+	"host" => "localhost"
+);
 $email = array(
 	"Username" => "userName",
 	"Password" => "myPass1",
-	"From" => ["email" => "myEmail", "name" => "App name"],
+	"From" => array("email" => "myEmail", "name" => "App name"),
 	"Host" => "smtp.gmail.com",
 	"Port" => 587,
 	"SMTPSecure" => "tls",
-	'Type' => "POP3",
+	"Type" => "POP3",
 );

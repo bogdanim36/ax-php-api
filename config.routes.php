@@ -1,10 +1,10 @@
 <?php
-require_once './module/User.php';
-define("API_ROOT", "/api/module");
+require_once get_path("pm", 'users/UserService.php');
+define("API_ROOT", "api/pm");
 define("ROUTE_PARAM", "_route_");
 
 $routes = array(
-	array("uri" => "account/getUserInfo", "file" => "Account.php", "authorized" => false),
+	array("uri" => "account/getUserInfo", "file" => "accounts/AccountController.php", "authorized" => false),
 	array("uri" => "account/login", "file" => "Account.php", "authorized" => false),
 	array("uri" => "account/logoff", "file" => "Account.php", "authorized" => true),
 	array("uri" => "account/resetPassword", "file" => "Account.php", "authorized" => false),
@@ -33,7 +33,7 @@ function routeAuthorizing($route, $dbConnection)
 
 	if (isset($_COOKIE["user-id"])) {
 		$userClass = new User($dbConnection);
-		$user = $userClass->getItemAction(array("email" => $_COOKIE["user-id"]));
+		$user = $userClass->getItem(array("email" => $_COOKIE["user-id"]));
 		if ($user["status"] && $user["data"]["esteActiv"] === "1") return true;
 		return true;
 	}
