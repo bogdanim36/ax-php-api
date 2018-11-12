@@ -12,8 +12,8 @@ class AccountController extends Controller
 		try {
 			if (!isset($_COOKIE["user-id"]) && !isset($this->postData->email)) throw new Exception("Login user");
 			$email = isset($_COOKIE["user-id"]) ? $_COOKIE["user-id"] : $this->postData->email;
-			$userClass = new UserService();
-			$users = $userClass->getAll(array("email" => array("operator" => "equal", "value" => $email)));
+			$userSrv = new UserService();
+			$users = $userSrv->getAll(array("email" => array("operator" => "equal", "value" => $email)));
 			if (count($users) == 0) throw new Exception("No user found for email: " . $email);
 			$user = $users[0];
 			if ($user["disabledAccess"] == 1) throw new Exception("Access is disabled for email: " . $email);
@@ -29,52 +29,40 @@ class AccountController extends Controller
 			$response["extra"]["version"] = APP_VERSION;
 			return $response;
 		} catch (Exception  $error) {
-			$response["errors"] = $error->getMessage();
-			return $response;
+			return $this->catchError($error);
 		}
 	}
 
 	public function login()
 	{
 		require_once $_SERVER["DOCUMENT_ROOT"] . "/api/module/User.php";
-		$response = array();
 		try {
 			if (!$this->postData->email) throw new Exception("No email provided");
 			if (!$this->postData->parola) throw new Exception("Nu e parolaaaaa");
-			$userObj = new User($this->db, null);
-			$users = $userObj->getUserByEmailAndPassword($this->postData->email, $this->postData->parola);
-			if (!$users["status"] || count($users["data"]) != 1) throw new Exception("No user found for email and password provided!");
-			$expired = 365 * 86400 + time();
-			setcookie("user-id", $this->postData->email, $expired, "/");
-			return $this->getUserInfoAction();
+			$userSrv = new UserService();
+			$users = $userSrv->getUserByEmailAndPassword($this->postData->email, $this->postData->parola);
+			if (count($users) != 1) throw new Exception("No user found for email and password provided!");
+			return $this->getUserInfo();
 		} catch (Exception  $error) {
-			$response["errors"] = $error->getMessage();
-			$response["status"] = false;
+			return $this->catchError($error);
 		}
-		$response["extra"]["version"] = APP_VERSION;
-		return $response;
 	}
 
 	public function logoff()
 	{
-		require_once $_SERVER["DOCUMENT_ROOT"] . "/api/module/User.php";
-		$response = array();
 		try {
 			setcookie("user-id", null, 1 + time(), "/");
 			unset($_COOKIE["user-id"]);
 			return array("status" => true);
 		} catch (Exception  $error) {
-			$response["errors"] = $error->getMessage();
-			$response["status"] = false;
+			return $this->catchError($error);
 		}
-		$response["extra"]["version"] = APP_VERSION;
-		return $response;
 	}
 
 	private function sendResetPassEmail($userEmail, $userName, $guid)
 	{
 		global $email;
-		$email["Subject"] = "Resetare parola Invoicng app pt. " . $userName;
+		$email["Subject"] = "Resetare parola pt. " . $userName;
 		$email["To"] = array("email" => $userEmail, "name" => $userName);
 		$email["MsgHTML"] = "";
 		$email["MsgHTML"] .= "<br>Utilizeaza acest link (numai cu Chrome browser pt. desktop) ptr. resetare parola:<br> ";
@@ -104,15 +92,13 @@ class AccountController extends Controller
 				$userName = $updateResponse["data"]["numeComplet"];
 				$response = $this->sendResetPassEmail($userEmail, $userName, $guid);
 				if (!$response["status"]) return $response;
-				$response = array("status" => true);
+				return $this->setOkResponse($response);
 			} else {
 				throw new Exception("No user found for " . $userEmail);
 			}
 		} catch (Exception  $error) {
-			$response["errors"] = $error->getMessage();
-			$response["status"] = false;
+			return $this->catchError();
 		}
-		return $response;
 	}
 
 	public function savePassword()
@@ -130,10 +116,7 @@ class AccountController extends Controller
 			$this->postData->parola = $response["data"]["parola"];
 			return $this->loginAction();
 		} catch (Exception  $error) {
-			$response = array();
-			$response["errors"] = $error->getMessage();
-			$response["status"] = false;
+			return $this->catchError();
 		}
-		return $response;
 	}
 }

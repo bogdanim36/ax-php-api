@@ -43,7 +43,7 @@ class DBSQL
 	public function exec()
 	{
 		$cmd = $this->text();
-		$queryResult = $this->service->query($cmd);
+		$queryResult = $this->service->db->query($cmd);
 		return $queryResult;
 }
 

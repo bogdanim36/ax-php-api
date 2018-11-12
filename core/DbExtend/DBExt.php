@@ -1,22 +1,23 @@
 <?php
+require_once get_path('vendor', "DB.php");
 
 class DBExt extends DB
 {
-	public $tableName;
-	public $tableKey;
-	public $structure;
+	private $driver;
+	private $service;
 
-	public function __construct($driver, $hostname, $username, $password, $database, $tableName, $tableKey = "id")
+	public function __construct($driver, $hostname, $username, $password, $database, $service)
 	{
 		parent::__construct($driver, $hostname, $username, $password, $database);
-
-		$this->tableName = $tableName;
-		$this->tableKey = $tableKey;
+		$this->driver = $driver;
+		$this->service = $service;
 	}
 
-	public function sql()
+	public function sql(): DBSQL
 	{
-		return new DBSQL($this);
+		$sqlClass = "DBSQL" . $this->driver;
+		require_once get_path("core/DBExtend", $sqlClass . ".php");
+		return new $sqlClass($this->service);
 	}
 
 }

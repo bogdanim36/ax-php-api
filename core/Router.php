@@ -1,7 +1,7 @@
 <?php
 define("DIR_DATABASE", $_SERVER["DOCUMENT_ROOT"] . "/api/vendor/database/");
 require_once get_path("", "config.routes.php");
-require_once get_path("vendor", "Db.php");
+require_once get_path("vendor", "DB.php");
 require_once get_path("", "config.secrets.php");
 require_once get_path("", "config.appinfo.php");
 define("DB_DATABASE", $dbConfig["dbName"]);

@@ -1,5 +1,4 @@
 <?php
-require_once get_path('core/DbExtend', 'DBMySQLiExt.php');
 
 class Controller
 {
@@ -155,7 +154,7 @@ class Controller
 			$this->db->commit();
 			return $response;
 		} catch (Exception  $error) {
-			return $this->db->rollback("delete", $error);
+			return $this->rollback();
 		}
 	}
 

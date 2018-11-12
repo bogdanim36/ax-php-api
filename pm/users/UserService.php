@@ -1,19 +1,14 @@
 <?php
 require_once get_path("core", "Service.php");
+require_once get_path("core/DBExtend", "DBExt.php");
 
 class UserService extends Service
 {
-	public $tableName = "users";
-	public $modelClass = "UserItem";
+	public $modelClass = "User";
 
 	public function __construct()
 	{
-		parent::__construct();
-		global $dbConfig;
-		$dbAccessClass = "DB" . $dbConfig["driver"] . "Ext";
-		require_once get_path("core/DBExtend", $dbAccessClass . ".php");
-		$this->db = new $dbAccessClass($dbConfig["host"], $dbConfig["user"], $dbConfig["password"], $dbConfig["dbName"], $this->tableName, $this->tableKey);
-
+		parent::__construct("users", "users", "id");
 	}
 
 	public function getUserByEmailAndPassword($email, $password)
@@ -32,9 +27,8 @@ class UserService extends Service
 
 	public function savePassword($resetLink, $password)
 	{
-		$userData = $this->getItemAction(array("resetLink" => $resetLink));
-		if (!$userData["status"]) return $userData;
-		if (count($userData["data"]) == 0) {
+		$userData = $this->getAll(array("resetLink" => $resetLink));
+		if (count($userData) == 0) {
 			$userData["status"] = false;
 			return $userData;
 		}

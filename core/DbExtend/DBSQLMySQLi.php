@@ -62,7 +62,7 @@ class DBSQLMySQLi extends DBSQL
 				if (is_null($value) && $fieldNullable == 'YES') {
 					$line = "NULL";
 				} else {
-					$value = $this->service->escape($value);
+					$value = $this->service->db->escape($value);
 					$line = $value == '' ? "" : "'$value'";
 				}
 				break;
@@ -75,7 +75,7 @@ class DBSQLMySQLi extends DBSQL
 				if (is_null($value) && $fieldNullable == 'YES') {
 					$line = "NULL";
 				} else {
-					$value = $this->service->escape($value);
+					$value = $this->service->db->escape($value);
 					if ($operator == "like") $value = "%$value%";
 					$line = "'$value'";
 				}
@@ -85,7 +85,7 @@ class DBSQLMySQLi extends DBSQL
 			case "decimal":
 			case "float":
 				if (is_null($value)) $line = "NULL";
-				else $line = $this->service->escape($value);
+				else $line = $this->service->db->escape($value);
 				break;
 			case "smallint":
 			case "tinyint":
@@ -127,7 +127,7 @@ class DBSQLMySQLi extends DBSQL
 					FROM information_schema.COLUMNS
 					WHERE Table_Schema = '%s'
 						AND LOWER(Table_Name) = '%s'", DB_DATABASE, $tableName);
-			$query = $this->service->query($sql);
+			$query = $this->service->db->query($sql);
 			if (count($query->rows) == 0) throw new Exception("Cannot retrive structure for table: $tableName !");
 			$this->tablesStructure[$tableName] = $query->rows;
 		}

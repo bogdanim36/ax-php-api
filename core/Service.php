@@ -6,9 +6,10 @@ class Service
 	public $item;
 	public $modelClass;
 	public $tableName;
+	public $tableAlias;
 	public $tableKey = "id";
 	/**
-	 * @var DBMySQLiExt
+	 * @var DBMExt
 	 */
 	public $db;
 	public $postData;
@@ -16,8 +17,18 @@ class Service
 	public $children = null;
 	public $validateOnWrite = true;
 
-	public function __construct()
+	public function __construct($tableName, $tableAlias, $tableKey)
 	{
+		$this->tableName = $tableName;
+		$this->tableAlias = $tableAlias;
+		$this->tableKey  = $tableKey;
+		global $dbConfig;
+		$this->db = new DBExt(
+			$dbConfig["driver"],
+			$dbConfig["host"],
+			$dbConfig["user"],
+			$dbConfig["password"],
+			$dbConfig["dbName"], $this);
 	}
 
 
@@ -47,7 +58,7 @@ class Service
 			}
 		}
 		$queryResult = $sql->exec();
-		return $queryResult ->rows;
+		return $queryResult->rows;
 	}
 
 
