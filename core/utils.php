@@ -44,3 +44,11 @@ function normalizePath($path)
 function get_path($folder, $file){
 	return $path = normalizePath($_SERVER["DOCUMENT_ROOT"] . "/api/" . (isset($folder)? $folder  . "/": ""). $file);
 }
+function globalExceptionHandler($error)
+{
+	ob_end_clean();
+	$trace = $error->getTraceAsString();
+	$message[] = $error->getMessage();
+	echo json_encode(array("status" => false, "errors" => array("message"=>$message, "trace"=>$trace)));
+	exit();
+}

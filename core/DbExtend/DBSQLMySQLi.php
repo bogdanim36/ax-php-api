@@ -3,13 +3,22 @@ require_once get_path("core/DbExtend/DBSQL", "DBSQL.php");
 
 class DBSQLMySQLi extends DBSQL
 {
-	private $tablesStructure;
-
 	public function __construct($service)
 	{
 		parent::__construct($service);
 	}
 
+	protected function getDistinct()
+	{
+		return ($this->distinct) ? " DISTINCT" : "";
+
+	}
+
+	protected function getFrom()
+	{
+		$this->tables[$this->tableAlias] = $this->tableName;
+		return "FROM `" . $this->tableName . "` AS " . $this->tableAlias;
+	}
 
 	protected function getColumns()
 	{
@@ -25,10 +34,10 @@ class DBSQLMySQLi extends DBSQL
 
 	protected function getWhere()
 	{
-		$items = $this->where->getItems();
+		$items = $this->where->items;
 		$list = "";
 		foreach ($items as $item) {
-			$list .= $list == "" ? "" : ("\n " . $item["type"]);
+			$list .= $list == "" ? "" : ("\n " . $item["type"] . " ");
 			$field = $item["field"];
 			$operator = $item["operator"];
 			$value = $item["value"];
@@ -41,6 +50,26 @@ class DBSQLMySQLi extends DBSQL
 		return $list;
 	}
 
+	protected function getJoin()
+	{
+
+		$joins = $this->join->items;
+		$list = "";
+		foreach ($joins as $join) {
+			$list .= ($list == "" ? "" : ("\n ")) . strtoupper($join->type) . " " . "JOIN ";
+			$this->tables[$join->tableAlias] = $join->tableName;
+			$list .=  "`" . $join->tableName . "` AS " . $join->tableAlias . " ON ";
+			$left = $join->onLeft;
+			$operator = $join->onOperator;
+			$right = $join->onRight;
+			$list .= $left;
+			$list .= $this->getOperatorFor($operator);
+			$list .= $right;
+		}
+		return $list;
+
+	}
+
 	protected function getOperatorFor($operator)
 	{
 		return strtoupper($operator);
@@ -48,7 +77,8 @@ class DBSQLMySQLi extends DBSQL
 
 	protected function getFieldValue($key, $value, $operator)
 	{
-		$table = explode('.', $key)[0];
+		$tableAlias = explode('.', $key)[0];
+		$table = isset($this->tables[$tableAlias]) ? $this->tables[$tableAlias] : $tableAlias;
 		$fieldName = explode('.', $key)[1];
 		$structure = $this->getTablesStructure($table);
 		$index = array_search(strtolower($fieldName), array_column($structure, 'FieldName'));
@@ -108,6 +138,19 @@ class DBSQLMySQLi extends DBSQL
 		}
 		if ($operator == "in") $line = "(" . $line . ")";
 		return $line;
+	}
+
+	protected function getOrder()
+	{
+
+		$orders = $this->order->items;
+		$list = "";
+		foreach ($orders as $order) {
+			$list .= $list == "" ? "ORDER BY " : ", ";
+			$list .= $order["by"] . " " . strtoupper($order["direction"]);
+		}
+		return $list;
+
 	}
 
 	protected function getTablesStructure($tableName)

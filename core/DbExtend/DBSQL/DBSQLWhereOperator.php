@@ -14,20 +14,20 @@ class DBSQLWhereOperator
 
 	public function equal($field, $value)
 	{
-		$this->where->addItem(array("type" => "and", "field" => $field, "operator" => "=", "value" => $value));
-		return $this;
+		$this->where->items[] = array("type" => "and", "field" => $field, "operator" => "=", "value" => $value);
+		return $this->where;
 	}
 
 	public function like($field, $value)
 	{
-		$this->where->addItem(array("type" => "and", "field" => $field, "operator" => "like", "value" => $value));
-		return $this;
+		$this->where->items[] = array("type" => "and", "field" => $field, "operator" => "like", "value" => $value);
+		return $this->where;
 	}
 
 	public function in($field, $value)
 	{
-		$this->_where->addItem(array("type" => "or", "field" => $field, "operator" => "in", "value" => $value));
-		return $this;
+		$this->where->items[] = array("type" => "or", "field" => $field, "operator" => "in", "value" => $value);
+		return $this->where;
 	}
 
 

@@ -154,17 +154,13 @@ class Controller
 			$this->db->commit();
 			return $response;
 		} catch (Exception  $error) {
-			return $this->rollback();
+			return $this->rollback("", $error);
 		}
 	}
 
 	public function catchError(Exception $error)
 	{
-		$response = array();
-		$field = isset($error->field) ? $error->field : "";
-		$response["errors"] = [$field => [$error->getMessage()]];
-		$response["status"] = false;
-		return $response;
+		throw $error;
 	}
 
 	public function setOkResponse($data)
@@ -186,13 +182,13 @@ class Controller
 		return array("status" => false, "error" => array("class" => $class, "method" => $method, "message" => $ex->getMessage()));
 	}
 
-	public function rollback($action, $exception = null, $response = null)
+	public function rollback($action, Exception $exception= null, $response = null)
 	{
 		$this->db->rollback();
 		if (method_exists($this, "rollbackCallback")) {
 			$this->rollbackCallback($action, $exception, $response);
 		}
-		if (isset($exception)) return $this->catchError($exception);
+		if (isset($exception)) throw $exception;
 		else if (isset($response)) return $response;
 	}
 

@@ -2,10 +2,9 @@
 require './core/utils.php';
 require './core/Router.php';
 ob_start();
-
+set_exception_handler('globalExceptionHandler');
 $route = new Router();
 $response = $route->submit();
-
 
 $list = ob_get_contents(); // Store buffer in variable
 
@@ -15,5 +14,6 @@ if ($list) {//that mean we have an echo response = uncatched error
 	$response["message"] = $list;
 }
 echo json_encode($response);
+
 
 

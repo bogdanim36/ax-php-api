@@ -1,15 +1,24 @@
 <?php
+require_once get_path("core/DbExtend/DBSQL", "DBSQL.php");
+require_once get_path("core/DbExtend/DBSQL", "DBSQLWhere.php");
+require_once get_path("core/DbExtend/DBSQL", "DBSQLColumns.php");
+require_once get_path("core/DbExtend/DBSQL", "DBSQLJoin.php");
+require_once get_path("core/DbExtend/DBSQL", "DBSQLOrder.php");
 
-require_once get_path("core/DbExtend/DBSQL", "DBSQLSelect.php");
-
-class DBSQL
+class DBSQLSelect extends DBSQL
 {
 	private $tableName;
 	private $tableKey;
 	private $tableAlias;
 	protected $tablesStructure;
+	public $columns;
+	public $where;
+	public $order ;
+	private $distinct = false;
+	private $limit;
+	protected $tables = [];
 	private $service;
-	public $select;
+	public $join;
 
 	public function __construct($service)
 	{
@@ -17,7 +26,10 @@ class DBSQL
 		$this->tableName = $service->tableName;
 		$this->tableAlias = $service->tableAlias;
 		$this->tableKey = $service->tableKey;
-		$this->select = new DBSQLSelect();
+		$this->where = new DBSQLWhere();
+		$this->columns = new DBSQLColumns();
+		$this->join = new DBSQLJoin();
+		$this->order = new DBSQLOrder();
 	}
 
 	public function &__get($property)
@@ -55,8 +67,14 @@ class DBSQL
 	public function exec()
 	{
 		$cmd = $this->text();
+		exit($cmd);
 		$queryResult = $this->service->db->query($cmd);
 		return $queryResult;
+	}
+
+	public function setDistinct(): void
+	{
+		$this->distinct = true;
 	}
 
 

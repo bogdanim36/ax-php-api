@@ -1,16 +1,12 @@
 <?php
-require_once get_path("core/DbExtend/DBSQL", "DBSQLWhereOperator.php");
 
-class DBSQLWhere
+class DBSQLOrder
 {
-	private $items=[];
-	public $and;
-	public $or;
+
+	private $items = [];
 
 	public function __construct()
 	{
-		$this->and = new DBSQLWhereOperator($this);
-		$this->or = new DBSQLWhereOperator($this);
 	}
 
 	public function &__get($property)
@@ -28,11 +24,13 @@ class DBSQLWhere
 
 		return $this;
 	}
-	public function group($left, $operator, $right): SqlWhere
+
+
+	public function by($expression, $direction = "asc")
 	{
-		$where = new SqlWhere();
-		$this->items[] = $where;
-		return $where;
+		if (!in_array($direction, ["asc", "desc"])) throw new \Exception("Order direction can by asc or desc");
+		$this->items[] = array("by" => $expression, "direction" => $direction);
+		return $this;
 	}
 
 }

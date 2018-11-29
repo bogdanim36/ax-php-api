@@ -1,12 +1,12 @@
 <?php
 require_once get_path("core", "Controller.php");
+require_once get_path("pm", "users/UserService.php");
 
 class AccountController extends Controller
 {
 	public function getUserInfo()
 	{
 		require_once get_path("core", "MenuRoles.php");
-		require_once get_path("pm", "users/UserService.php");
 		$response = array();
 		$response["status"] = false;
 		try {
@@ -35,7 +35,6 @@ class AccountController extends Controller
 
 	public function login()
 	{
-		require_once $_SERVER["DOCUMENT_ROOT"] . "/api/module/User.php";
 		try {
 			if (!$this->postData->email) throw new Exception("No email provided");
 			if (!$this->postData->parola) throw new Exception("Nu e parolaaaaa");

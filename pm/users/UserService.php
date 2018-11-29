@@ -13,16 +13,16 @@ class UserService extends Service
 
 	public function getUserByEmailAndPassword($email, $password)
 	{
-		$cmd = 'SELECT a.* FROM `' . $this->tableName . '` a ';
-		$cmd .= "LEFT JOIN `users-pw` b on b.userId = a.id ";
-		$cmd .= "WHERE a.email = '{$this->db->escape($email)}' AND b.password = '{$this->db->escape($password)}'";
-		$queryResult = $this->db->query($cmd);
-		$response = array();
-		$response["data"] = $queryResult->rows;
-		$response["status"] = true;
-		$sql = $this->db->sql();
-		$sql->columns->addAll();
-		return $response;
+		$select = $this->db->select;
+		$select->columns->addAll();
+		$select->join->left()->table("users-pw", "b")->on("b.userId", "=", "users.id");
+		$select->where->and->equal("users.email", $email)->and->equal("b.password", $password);
+//		exit($sql->text());
+//		$cmd = 'SELECT a.* FROM `' . $this->tableName . '` a ';
+//		$cmd .= "LEFT JOIN `users-pw` b on b.userId = a.id ";
+//		$cmd .= "WHERE a.email = '{$this->db->escape($email)}' AND b.password = '{$this->db->escape($password)}'";
+//		$queryResult = $this->db->query($cmd);
+		return $select->exec()->rows;
 	}
 
 	public function savePassword($resetLink, $password)
